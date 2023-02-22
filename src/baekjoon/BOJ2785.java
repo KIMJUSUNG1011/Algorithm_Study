@@ -19,7 +19,7 @@ import java.util.*;
 // 2. 음수 위치와 양수 위치를 구분
 // 3. M 만큼 묶어내는 아이디어
 
-public class Q2785 {
+public class BOJ2785 {
 
     static int N, M, answer;
     static List<Integer> plusList, minusList;

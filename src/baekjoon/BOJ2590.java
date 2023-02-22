@@ -15,7 +15,7 @@ import java.io.*;
 // 일단 6 * 6 에 최대한 많이 구겨넣어보자
 // 들어가는 순서는 중요하지 않음
 
-public class Q2590 {
+public class BOJ2590 {
 
     static int[] arr;
 
