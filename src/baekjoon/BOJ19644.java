@@ -6,59 +6,76 @@ import java.util.*;
 public class BOJ19644 {
 
     static int L, mL, mK, C;
-    static int[] arr;
+    static long[] zombieStamina;
+    static boolean[] bombPosition;
+    static String answer = "YES";
 
     public static void main(String[] args) throws IOException {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         L = Integer.parseInt(br.readLine());
-        arr = new int[L + 1];
+        zombieStamina = new long[L + 1];
+        bombPosition = new boolean[L + 1];
         StringTokenizer st = new StringTokenizer(br.readLine(), " ");
         mL = Integer.parseInt(st.nextToken());
         mK = Integer.parseInt(st.nextToken());
         C = Integer.parseInt(br.readLine());
 
         for (int i = 1; i <= L; i++) {
-            arr[i] = Integer.parseInt(br.readLine());
+            zombieStamina[i] = Integer.parseInt(br.readLine());
         }
 
-        // 기관총을 모두 쏴본다.
-        for (int i = 1; i <= mL && i <= L; i++) {
-            arr[i] -= i * mK;
-        }
-
-        // 기관총을 모두 쏴본다.
-        for (int i = mL + 1; i <= L; i++) {
-            arr[i] -= mL * mK;
-        }
-
-        // 지뢰를 쏴본다.
+        // 기관총을 모두 쐈을 때 데미지를 계산해본다.
         for (int i = 1; i <= L; i++) {
-
-            if (arr[i] > 0) {
-
-                if (C > 0) {
-
-                    // 지뢰 개수 감소
-                    C--;
-
-                    // 지뢰를 쐈었다면 기관총을 못쐈을 것이기 때문에
-                    // 기관총을 쏜 것은 없던 일로 처리해준다.
-                    if (i + 1 <= L) {
-                        if (i + 1 <= mL) { arr[i + 1] += i * mK; }
-                        if (i + 1 > mL) { arr[i + 1] += mL * mK; }
-                    }
-                    if (i + 2 <= L) {
-                        if (i + 2 <= mL) { arr[i + 2] += i * mK; }
-                        if (i + 2 > mL) { arr[i + 2] += mL * mK; }
-                    }
-                } else {
-                    System.out.println("NO");
-                    return;
-                }
+            if (i >= 1 && i <= mL) {
+                zombieStamina[i] -= i * mK;
+            } else {
+                zombieStamina[i] -= mL * mK;
+            }
+            // 반드시 지뢰를 던져야하는 위치를 체크
+            if (zombieStamina[i] > 0) {
+                bombPosition[i] = true;
             }
         }
 
-        System.out.println("YES");
+        int bombCount = 0;
+
+        for (int i = 1; i <= L; i++) {
+
+            // 슬라이딩 윈도우 -> 폭탄 개수 더하기
+            if (bombPosition[i]) {
+                bombCount++;
+            }
+
+            // 슬라이딩 윈도우 -> 폭탄 개수 빼기
+            if (i > mL && bombPosition[i - mL]) {
+                bombCount--;
+            }
+
+            // 기관총을 맞는 좀비 -> 나중에 폭탄을 맞게 될 수 있음
+            if (!bombPosition[i]) {
+//                System.out.println(i + " " + bombCount);
+                zombieStamina[i] += bombCount * mK;
+            }
+        }
+
+//        System.out.println("bombCount : " + bombCount);
+
+//        for (int i = 1; i <= L; i++) {
+//            System.out.print(zombieStamina[i] + " ");
+//        }
+//        System.out.println();
+
+        for (int i = 1; i <= L; i++) {
+            if (zombieStamina[i] > 0) {
+                if (C == 0) {
+                    answer = "NO";
+                    break;
+                }
+                C--;
+            }
+        }
+
+        System.out.println(answer);
     }
 }
