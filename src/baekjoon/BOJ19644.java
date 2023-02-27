@@ -5,9 +5,8 @@ import java.util.*;
 
 public class BOJ19644 {
 
-    static int L, mL, mK, C;
+    static int L, mL, mK, C, usedBombCount;
     static long[] zombieStamina;
-    static boolean[] bombPosition;
     static String answer = "YES";
 
     public static void main(String[] args) throws IOException {
@@ -15,7 +14,6 @@ public class BOJ19644 {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         L = Integer.parseInt(br.readLine());
         zombieStamina = new long[L + 1];
-        bombPosition = new boolean[L + 1];
         StringTokenizer st = new StringTokenizer(br.readLine(), " ");
         mL = Integer.parseInt(st.nextToken());
         mK = Integer.parseInt(st.nextToken());
@@ -25,55 +23,32 @@ public class BOJ19644 {
             zombieStamina[i] = Integer.parseInt(br.readLine());
         }
 
-        // 기관총을 모두 쐈을 때 데미지를 계산해본다.
-        for (int i = 1; i <= L; i++) {
-            if (i >= 1 && i <= mL) {
-                zombieStamina[i] -= i * mK;
-            } else {
-                zombieStamina[i] -= mL * mK;
-            }
-            // 반드시 지뢰를 던져야하는 위치를 체크
-            if (zombieStamina[i] > 0) {
-                bombPosition[i] = true;
-            }
-        }
-
-        int bombCount = 0;
-
         for (int i = 1; i <= L; i++) {
 
-            // 슬라이딩 윈도우 -> 폭탄 개수 더하기
-            if (bombPosition[i]) {
-                bombCount++;
+            // 현재 위치의 기관총 데미지 계산
+            long damage = i >= 1 && i <= mL ? i * mK : mL * mK;
+
+            // 슬라이딩 윈도우 -> 사용된 지뢰 개수 감소
+            if (i > mL && zombieStamina[i - mL] > 0) {
+                usedBombCount--;
             }
 
-            // 슬라이딩 윈도우 -> 폭탄 개수 빼기
-            if (i > mL && bombPosition[i - mL]) {
-                bombCount--;
-            }
+            // 지뢰로 인해 기관총을 맞지 못한 경우 데미지 재계산
+            damage -= usedBombCount * mK;
 
-            // 기관총을 맞는 좀비 -> 나중에 폭탄을 맞게 될 수 있음
-            if (!bombPosition[i]) {
-//                System.out.println(i + " " + bombCount);
-                zombieStamina[i] += bombCount * mK;
-            }
-        }
-
-//        System.out.println("bombCount : " + bombCount);
-
-//        for (int i = 1; i <= L; i++) {
-//            System.out.print(zombieStamina[i] + " ");
-//        }
-//        System.out.println();
-
-        for (int i = 1; i <= L; i++) {
-            if (zombieStamina[i] > 0) {
+            // 지뢰가 필요한 경우
+            if (zombieStamina[i] > damage) {
                 if (C == 0) {
                     answer = "NO";
                     break;
                 }
+                // 슬라이딩 윈도우 -> 사용된 지뢰 개수 증가
+                usedBombCount++;
                 C--;
             }
+
+            // 지뢰를 사용한 경우에는 좀비의 체력이 0 보다 클 것
+            zombieStamina[i] -= damage;
         }
 
         System.out.println(answer);
