@@ -66,6 +66,7 @@ public class Main
                 else
                 {
                     answerList.add(graph[p].get(i));
+                    return;
                 }
             }
         }
